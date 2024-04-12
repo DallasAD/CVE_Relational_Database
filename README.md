@@ -8,7 +8,7 @@ git clone https://github.com/DallasAD/CVE_Relational_Database
 ```bash
 apt install docker
 ```
-## Step 3: Run Docker containers using docker-compose
+## Step 3: Run Docker containers using docker-compose. Make sure you are in the project directory.
 ```bash
 docker-compose up -d
 ```
