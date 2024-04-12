@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CVE Data Management</title>
+</head>
+<body>
+  <h1>CVE Data Management</h1>
+  {% if message %}
+    <p>{{ message }}</p>
+  {% endif %}
+
+  <form method="POST">
+    <button type="submit">Fetch and Store CVE Data</button>
+  </form>
+
+  <h2>Search CVE Data</h2>
+  <form method="POST" action="/search">
+    <label for="search_term">Search Term:</label>
+    <input type="text" id="search_term" name="search_term">
+    <button type="submit">Search</button>
+  </form>
+
+  <h2>Sort CVE Data</h2>
+  <p>
+    <a href="/sort/id">Sort by ID</a> |
+    <a href="/sort/cvss">Sort by CVSS</a> |
+    <a href="/sort/software_version">Sort by Software Version</a> |
+    <a href="/sort/cve_type">Sort by CVE Type</a> |
+    <a href="/sort/date">Sort by Date</a>
+  </p>
+
+  <h2>Fetched CVE Data (if any)</h2>
+  <table id="cve_data_table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>CVSS</th>
+        <th>Software Version</th>
+        <th>CVE Type</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      </tbody>
+  </table>
+
+  <script>
+    // (Optional) Add JavaScript functionality for dynamic updates, searching, etc.
+  </script>
+</body>
+</html>
