@@ -4,7 +4,7 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# Database connection details 
+# Database connection details
 db_config = {
     "host": "localhost",
     "user": "root",
@@ -23,51 +23,45 @@ def fetch_cve_data():
 
 
 def store_cve_data(cve_data):
-  try:
-    connection = mysql.connector.connect(**db_config)
-    cursor = connection.cursor()
-
-    # Check if table exists using reflection
-    engine = connection.engine
-    inspector = connection.inspect(engine)
-    exists = inspector.has_table('cve_data')
-
-    if not exists:
-      # Create table if it doesn't exist
-      create_table_query = """
-        CREATE TABLE cve_data (
-          id VARCHAR(255) PRIMARY KEY,
-          cvss VARCHAR(20),
-          software_version VARCHAR(100),
-          cve_type VARCHAR(50),
-          date VARCHAR(20)
-        );
-      """
-      cursor.execute(create_table_query)
-      connection.commit()
-      print("Created CVE data table")
-
-    # Build SQL insert query with placeholders for values
-    query = """
-        INSERT INTO cve_data (id, cvss, software_version, cve_type, date)
-        VALUES (%s, %s, %s, %s, %s)
+    # Create table if it doesn't exist
+    create_table_query = """
+         CREATE TABLE cve_table (
+           id VARCHAR(255) PRIMARY KEY,
+           cvss VARCHAR(20),
+           software_version VARCHAR(100),
+           cve_type VARCHAR(50),
+           date VARCHAR(20)
+    );
     """
-    for cve in cve_data["results"]["CVE_data_items"]:
-      cve_details = cve["cve"]["CVE_data_meta"]
-      cursor.execute(query, (
-        cve_details["ID"],
-        cve_details.get("cvss", None),  # Handle potential missing CVSS data
-        cve["configurations"][0]["cpe"]["product"]["version"],  # Assuming first entry for software version
-        cve_details["cve_type"],
-        cve_details["published"],
-      ))
-    connection.commit()
-    connection.close()
-    return "CVE data stored successfully!"
-  except requests.exceptions.RequestException as e:
-    return f"Error fetching data from NVD: {str(e)}"
-  except mysql.connector.Error as e:
-    return f"Error storing data in database: {str(e)}"
+
+    try:
+        connection = mysql.connector.connect(**db_config)
+        cursor = connection.cursor()
+        cursor.execute(create_table_query)
+        connection.commit()
+        print("Created CVE data table")
+    except mysql.connector.Error as err:
+        if "already exists" in str(err):
+            print("Table already Exists")
+        else:
+            print("Error:", err)
+    finally:
+        # Build SQL insert query with placeholders for values
+        query = """
+            INSERT INTO cve_data (id, cvss, software_version, cve_type, date)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        for cve in cve_data["results"]["CVE_data_items"]:
+            cve_details = cve["cve"]["CVE_data_meta"]
+            cursor.execute(query, (
+                cve_details["ID"],
+                cve_details.get("cvss", None),  # Handle potential missing CVSS data
+                cve["configurations"][0]["cpe"]["product"]["version"],  # Assuming first entry for software version
+                cve_details["cve_type"],
+                cve_details["published"],
+            ))
+        connection.commit()
+        connection.close()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
