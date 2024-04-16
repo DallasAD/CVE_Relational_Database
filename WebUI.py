@@ -140,19 +140,6 @@ def store_cve_data(cve_data):
           print("Sucessful insertion of data")
     connection.close()
 
-"""
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        try:
-            cve_data = fetch_cve_data()
-            message = store_cve_data(cve_data)
-            return render_template("index.html", message=message)
-        except Exception as e:  # Catch any unexpected exceptions
-            return f"An error occurred: {str(e)}"
-
-    return render_template("index.html")
-"""
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -175,8 +162,8 @@ def search():
     cursor = connection.cursor()
 
     # Build dynamic query based on search term
-    query = f"SELECT * FROM cve_data WHERE id LIKE %s OR software_version LIKE %s OR cve_type LIKE %s"
-    cursor.execute(query, ("%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%"))
+    query = f"SELECT * FROM cve_table WHERE id LIKE %s OR cvssV2 LIKE %s OR cvssV3 LIKE %s OR description LIKE %s OR last_modified LIKE %s OR first_criteria LIKE %s"
+    cursor.execute(query, ("%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%"))
     cve_data = cursor.fetchall()
 
     connection.close()
@@ -185,14 +172,14 @@ def search():
 
 @app.route("/sort/<sort_attribute>", methods=["GET"])
 def sort(sort_attribute):
-    valid_attributes = ["id", "cvss", "software_version", "cve_type", "date"]
+    valid_attributes = ["id", "cvssV2", "cvssV3", "description", "last_modified", "first_criteria"]
     if sort_attribute not in valid_attributes:
         return jsonify({"error": "Invalid sort attribute"})
 
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
 
-    query = f"SELECT * FROM cve_data ORDER BY {sort_attribute}"
+    query = f"SELECT * FROM cve_table ORDER BY {sort_attribute}"
     cursor.execute(query)
     cve_data = cursor.fetchall()
 

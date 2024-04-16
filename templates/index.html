@@ -13,14 +13,15 @@
     <h2>Search CVE Database</h2>
     <input type="text" id="searchInput" placeholder="Search...">
     <button id="searchBtn">Search</button>
-    <table id="cveTable">
+    <table border="1" align="left" id="cveTable">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>CVSS</th>
-                <th>Software Version</th>
-                <th>CVE Type</th>
-                <th>Date</th>
+                <th>CVSSv2</th>
+                <th>CVSSv3</th>
+                <th>Description</th>
+                <th>Last Modified</th>
+		<th>First Criteria</th>
             </tr>
         </thead>
         <tbody>
@@ -57,6 +58,7 @@
                     row.append($("<td>").text(record[2]));
                     row.append($("<td>").text(record[3]));
                     row.append($("<td>").text(record[4]));
+		    row.append($("<td>").text(record[5]));
                     tableBody.append(row);
                 });
             }
