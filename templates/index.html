@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVE Database Update</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>CVE Database Update</h1>
+    <button id="updateBtn">Update CVE Database</button>
+    <hr>
+    <h2>Search CVE Database</h2>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button id="searchBtn">Search</button>
+    <table id="cveTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>CVSS</th>
+                <th>Software Version</th>
+                <th>CVE Type</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table rows will be dynamically populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            // Function to update CVE database
+            $("#updateBtn").click(function() {
+                $.post("/", function(data, status) {
+                    alert("CVE Database updated successfully!");
+                });
+            });
+
+            // Function to search CVE database
+            $("#searchBtn").click(function() {
+                var searchTerm = $("#searchInput").val();
+                $.post("/search", { search_term: searchTerm }, function(data, status) {
+                    populateTable(data);
+                });
+            });
+
+            // Function to populate table with CVE records
+            function populateTable(cveData) {
+                var tableBody = $("#cveTable tbody");
+                tableBody.empty(); // Clear existing rows
+
+                cveData.forEach(function(record) {
+                    var row = $("<tr>");
+                    row.append($("<td>").text(record[0]));
+                    row.append($("<td>").text(record[1]));
+                    row.append($("<td>").text(record[2]));
+                    row.append($("<td>").text(record[3]));
+                    row.append($("<td>").text(record[4]));
+                    tableBody.append(row);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
