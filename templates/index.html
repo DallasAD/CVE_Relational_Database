@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,69 +6,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CVE Database Update</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #333; /* Set consistent dark gray background color */
-            color: #fff; /* Set text color to white */
-        }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #333; /* Set consistent dark gray background color */
+        color: #fff; /* Set text color to white */
+    }
 
-        .container {
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    .container {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-        h1, h2 {
-            color: #fff; /* Set heading color to white */
-        }
+    h1, h2 {
+        color: #fff; /* Set heading color to white */
+    }
 
-        .btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #622569;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
 
-        .btn:hover {
-            background-color: #0056b3;
-        }
+    .btn:hover {
+        background-color: #141010;
+    }
 
-        .search-container {
-            margin-bottom: 20px;
-        }
+    .search-container {
+        margin-bottom: 20px;
+        background-color: #333; /* Set search container background color to white */
+        padding: 10px; /* Add padding for better appearance */
+        border-radius: 4px; /* Add border radius for rounded corners */
+    }
 
-        .search-input {
-            padding: 8px;
-            width: 200px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
+    .search-input {
+        padding: 8px;
+        width: 200px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
 
-        #cveTable {
-            width: 100%; /* Set table width to 100% */
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+    #cveTable {
+        width: 100%; /* Set table width to 100% */
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
 
-        #cveTable th, #cveTable td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
+    #cveTable th, #cveTable td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
 
-        #cveTable th {
-            background-color: #007bff; /* Set table header background color */
-        }
+    #cveTable th {
+        background-color: #622569; /* Set table header background color */
+    }
 
-        #cveTable tbody tr:nth-child(even) {
-            background-color: #f9f9f9; /* Set even row background color */
-        }
+    #cveTable tbody tr:nth-child(even) {
+        background-color: #622569; /* Set even row background color */
+    }
+
+    #cveTable tbody tr:nth-child(odd) {
+        color: #fff; /* Set text color to black for odd rows */
+    }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
