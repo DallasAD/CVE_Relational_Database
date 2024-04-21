@@ -3,8 +3,10 @@ import requests
 import mysql.connector
 from time import sleep  # for retry pauses
 import bleach  # Import bleach for input sanitization
+from flask_sslify import SSLify # for SSL
 
 app = Flask(__name__)
+sslify = SSLify(app)
 
 # Database connection details
 db_config = {
@@ -194,4 +196,4 @@ def sort(sort_attribute):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, ssl_context=('localhost.crt', 'localhost.key'), debug=True)

@@ -2,3 +2,4 @@ Flask
 requests
 mysql-connector-python
 bleach
+flask_sslify
