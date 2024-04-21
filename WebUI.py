@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import requests
 import mysql.connector
 from time import sleep  # for retry pauses
+import bleach  # Import bleach for input sanitization
 
 app = Flask(__name__)
 
@@ -15,6 +16,10 @@ db_config = {
 
 # NVD API endpoint for Microsoft Word CVEs
 nvd_api_url = "https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=microsoft+word"
+
+# Function to sanitize input using bleach
+def sanitize_input(input_string):
+    return bleach.clean(input_string, strip=True)
 
 def fetch_cve_data():
     response = requests.get(nvd_api_url)
@@ -157,7 +162,7 @@ def index():
 
 @app.route("/search", methods=["POST"])
 def search():
-    search_term = request.form.get("search_term")
+    search_term = sanitize_input(request.form.get("search_term"))
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
 
@@ -172,6 +177,7 @@ def search():
 
 @app.route("/sort/<sort_attribute>", methods=["GET"])
 def sort(sort_attribute):
+    sort_attribute = sanitize_input(sort_attribute)
     valid_attributes = ["id", "cvssV2", "cvssV3", "description", "last_modified", "first_criteria"]
     if sort_attribute not in valid_attributes:
         return jsonify({"error": "Invalid sort attribute"})

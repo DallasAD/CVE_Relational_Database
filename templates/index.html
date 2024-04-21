@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVE Database Update</title>
+    <title>CVE Database</title>
     <style>
     body {
         font-family: Arial, sans-serif;
@@ -77,6 +76,7 @@
         color: #fff; /* Set text color to black for odd rows */
     }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -116,12 +116,15 @@
             });
 
             // Function to search CVE database
-            $("#searchBtn").click(function() {
+            $("#searchBtn").click(function () {
                 var searchTerm = $("#searchInput").val();
-                $.post("/search", { search_term: searchTerm }, function(data, status) {
+                // Sanitize user input using DOMPurify before searching the database
+                var sanitizedSearchTerm = DOMPurify.sanitize(searchTerm);
+                $.post("/search", {search_term: sanitizedSearchTerm}, function (data, status) {
                     populateTable(data);
                 });
             });
+
 
             // Function to populate table with CVE records
             function populateTable(cveData) {
