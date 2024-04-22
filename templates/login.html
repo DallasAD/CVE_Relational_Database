@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> <!-- Include CryptoJS -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,7 +67,7 @@
         {% if error %}
             <div class="error-message">{{ error }}</div>
         {% endif %}
-        <form method="post">
+        <form id="loginForm" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -78,5 +79,15 @@
             <button type="submit" class="btn">Login</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            var passwordInput = document.getElementById('password');
+            var passwordValue = passwordInput.value;
+            var hashedPassword = CryptoJS.SHA256(passwordValue).toString(); // Hash the password using CryptoJS
+
+            passwordInput.value = hashedPassword;
+        });
+    </script>
 </body>
 </html>

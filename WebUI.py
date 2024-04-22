@@ -4,6 +4,7 @@ import mysql.connector
 from time import sleep  # for retry pauses
 import bleach  # Import bleach for input sanitization
 from flask_sslify import SSLify # for SSL
+import hashlib
 
 app = Flask(__name__)
 sslify = SSLify(app)
@@ -56,7 +57,10 @@ def create_cve_table(cursor):
         ON DUPLICATE KEY UPDATE username=username;
     """
 
-    cursor.execute(insert_default_user_query, ("admin", "admin"))
+    # Hash the default password before insertion
+    default_password_hash = hashlib.sha256("admin".encode()).hexdigest()
+
+    cursor.execute(insert_default_user_query, ("admin", default_password_hash))
 
 def store_cve_data(cursor, cve_data):
     try:
