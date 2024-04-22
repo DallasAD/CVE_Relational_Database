@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import requests
 import mysql.connector
 from time import sleep  # for retry pauses
@@ -28,46 +28,38 @@ def fetch_cve_data():
     response.raise_for_status()  # Raise an exception for non-200 status codes
     return response.json()
 
-def store_cve_data(cve_data):
-    # Create table if it doesn't exist
+def create_cve_table(cursor):
     create_table_query = """
-         CREATE TABLE cve_table (
+         CREATE TABLE IF NOT EXISTS cve_table (
            id VARCHAR(255) PRIMARY KEY,
            cvssV2 VARCHAR(1000),
            cvssV3 VARCHAR(1000),
-           description TEXT(100000),
+           description TEXT,
            last_modified VARCHAR(1000),
            first_criteria VARCHAR(1000)
     );
     """
+    cursor.execute(create_table_query)
 
+    # Create Web_Users table
+    create_users_table_query = """
+         CREATE TABLE IF NOT EXISTS Web_Users (
+           username VARCHAR(255) PRIMARY KEY,
+           password VARCHAR(255)
+    );
+    """
+    cursor.execute(create_users_table_query)
+
+    # Insert default user
+    insert_default_user_query = """
+        INSERT INTO Web_Users (username, password) VALUES (%s, %s)
+        ON DUPLICATE KEY UPDATE username=username;
+    """
+
+    cursor.execute(insert_default_user_query, ("admin", "admin"))
+
+def store_cve_data(cursor, cve_data):
     try:
-        MAX_RETRIES = 20  # Define the maximum number of attempts
-        for attempt in range(1, MAX_RETRIES + 1):
-            try:
-                connection = mysql.connector.connect(**db_config)
-                print(f"Connected successfully on attempt {attempt}!\n")
-                break  # Exit the loop on successful connection
-            except mysql.connector.Error as err:
-                print(f"Connection failed on attempt {attempt}: {err}")
-                if attempt == MAX_RETRIES:
-                    print("Reached maximum retries. Exiting...")
-                    exit(1)  # Exit the program with an error code
-                else:
-                    delay = 2 ** attempt  # Exponential backoff for retries
-                    print(f"Retrying in {delay} seconds...")
-                    sleep(delay)
-        cursor = connection.cursor()
-        cursor.execute(create_table_query)
-        connection.commit()
-        print("Created CVE data table\n")
-    except mysql.connector.Error as err:
-        if "already exists" in str(err):
-            print("Table already Exists")
-        else:
-            print("Error:", err)
-    finally:
-      try:
         # Build SQL insert query with placeholders for values
         query = """
             INSERT IGNORE INTO cve_table (id, cvssV2, cvssV3, description, last_modified, first_criteria)
@@ -139,15 +131,41 @@ def store_cve_data(cve_data):
                 last_modified,
                 first_criteria,
             ))
-            connection.commit()
+            cursor.connection.commit()
 
-      except Exception as e:
-        print(f"An error occured: {str(e)}")
-      finally:
-          print("Sucessful insertion of data")
-    connection.close()
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        print("Successful insertion of data")
 
 @app.route("/", methods=["GET", "POST"])
+def login():
+    # create tables
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor()
+    create_cve_table(cursor)  # create the tables
+    connection.commit()
+
+    if request.method == "POST":
+
+        username = sanitize_input(request.form.get("username"))
+        password = sanitize_input(request.form.get("password"))
+
+        query = "SELECT * FROM Web_Users WHERE username = %s AND password = %s"
+        cursor.execute(query, (username, password))
+        user = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if user:
+            return redirect(url_for('index'))  # Redirect to index page if authentication is successful
+        else:
+            return render_template("login.html", error="Invalid username or password")
+
+    return render_template("login.html")
+
+@app.route("/index", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         try:

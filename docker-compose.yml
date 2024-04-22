@@ -8,8 +8,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=cve_data
-    volumes:
-      - mysql_data:/var/lib/mysql
+        #volumes:
+      #- mysql_data:/var/lib/mysql
 
   webui:
     build: .
@@ -23,5 +23,5 @@ services:
     depends_on:
       - mysql
 
-volumes:
-  mysql_data:
+        #volumes:
+        #mysql_data:
