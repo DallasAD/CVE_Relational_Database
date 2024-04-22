@@ -29,7 +29,7 @@ def fetch_cve_data():
     response.raise_for_status()  # Raise an exception for non-200 status codes
     return response.json()
 
-def create_cve_table(cursor):
+def create_tables(cursor):
     create_table_query = """
          CREATE TABLE IF NOT EXISTS cve_table (
            id VARCHAR(255) PRIMARY KEY,
@@ -58,9 +58,12 @@ def create_cve_table(cursor):
     """
 
     # Hash the default password before insertion
-    default_password_hash = hashlib.sha256("admin".encode()).hexdigest()
+    defaultAdmin_password_hash = hashlib.sha256("admin".encode()).hexdigest()
+    defaultUser_password_hash = hashlib.sha256("password".encode()).hexdigest()
 
-    cursor.execute(insert_default_user_query, ("admin", default_password_hash))
+    cursor.execute(insert_default_user_query, ("admin", defaultAdmin_password_hash))
+    cursor.execute(insert_default_user_query, ("user", defaultUser_password_hash))
+
 
 def store_cve_data(cursor, cve_data):
     try:
@@ -147,7 +150,7 @@ def login():
     # create tables
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
-    create_cve_table(cursor)  # create the tables
+    create_tables(cursor)  # create the tables
     connection.commit()
 
     if request.method == "POST":
