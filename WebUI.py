@@ -30,7 +30,7 @@ def fetch_cve_data():
     return response.json()
 
 def create_tables(cursor):
-    create_table_query = """
+    create_cve_table_query = """
          CREATE TABLE IF NOT EXISTS cve_table (
            id VARCHAR(255) PRIMARY KEY,
            cvssV2 VARCHAR(1000),
@@ -40,20 +40,21 @@ def create_tables(cursor):
            first_criteria VARCHAR(1000)
     );
     """
-    cursor.execute(create_table_query)
+    cursor.execute(create_cve_table_query)
 
     # Create Web_Users table
     create_users_table_query = """
          CREATE TABLE IF NOT EXISTS Web_Users (
            username VARCHAR(255) PRIMARY KEY,
-           password VARCHAR(255)
+           password VARCHAR(255),
+           isAdmin TINYINT(1)
     );
     """
     cursor.execute(create_users_table_query)
 
     # Insert default user
     insert_default_user_query = """
-        INSERT INTO Web_Users (username, password) VALUES (%s, %s)
+        INSERT INTO Web_Users (username, password, isAdmin) VALUES (%s, %s, %s)
         ON DUPLICATE KEY UPDATE username=username;
     """
 
@@ -61,8 +62,8 @@ def create_tables(cursor):
     defaultAdmin_password_hash = hashlib.sha256("admin".encode()).hexdigest()
     defaultUser_password_hash = hashlib.sha256("password".encode()).hexdigest()
 
-    cursor.execute(insert_default_user_query, ("admin", defaultAdmin_password_hash))
-    cursor.execute(insert_default_user_query, ("user", defaultUser_password_hash))
+    cursor.execute(insert_default_user_query, ("admin", defaultAdmin_password_hash, 1))
+    cursor.execute(insert_default_user_query, ("user", defaultUser_password_hash, 0))
 
 
 def store_cve_data(cursor, cve_data):
