@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import requests
 import mysql.connector
 from time import sleep  # for retry pauses
@@ -8,6 +8,7 @@ import hashlib
 
 app = Flask(__name__)
 sslify = SSLify(app)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 # Database connection details
 db_config = {
@@ -168,10 +169,10 @@ def login():
 
         if user_row:
             user = dict(zip(cursor.column_names, user_row))  # Convert tuple to dictionary
-            isAdmin = user['isAdmin']
-            if isAdmin == 1:
+            session['isAdmin'] = user['isAdmin']
+            if session['isAdmin'] == 1:
                 return redirect(url_for('adminpanel'))  # admin panel
-            elif isAdmin == 0:
+            else:
                 return redirect(url_for('userpanel'))  # Redirect to user panel
         else:
             return render_template("login.html", error="Invalid username or password")
@@ -180,21 +181,24 @@ def login():
 
 @app.route("/adminpanel", methods=["GET", "POST"])
 def adminpanel():
-    if request.method == "POST":
-        try:
-            cve_data = fetch_cve_data()
-            if cve_data:
-                connection = mysql.connector.connect(**db_config)
-                cursor = connection.cursor()
-                store_cve_data(connection, cursor, cve_data)
+    if 'isAdmin' in session and session['isAdmin'] == 1:
+        if request.method == "POST":
+            try:
+                cve_data = fetch_cve_data()
+                if cve_data:
+                    connection = mysql.connector.connect(**db_config)
+                    cursor = connection.cursor()
+                    store_cve_data(connection, cursor, cve_data)
 
-                return jsonify({"message": "CVE Database updated successfully"})
-            else:
-                return jsonify({"error": "Failed to fetch CVE data"})
-        except Exception as e:
-            return jsonify({"error": "An error occurred while updating CVE database"})
+                    return jsonify({"message": "CVE Database updated successfully"})
+                else:
+                    return jsonify({"error": "Failed to fetch CVE data"})
+            except Exception as e:
+                return jsonify({"error": "An error occurred while updating CVE database"})
+        return render_template("admin.html")
+    else:
+        return redirect(url_for('userpanel'))
 
-    return render_template("admin.html")
 
 @app.route("/userpanel", methods=["GET", "POST"])
 def userpanel():
