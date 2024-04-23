@@ -10,6 +10,8 @@ app = Flask(__name__)
 sslify = SSLify(app)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
+nvd_api_url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch="
+
 # Database connection details
 db_config = {
     "host": "mysql",
@@ -17,9 +19,6 @@ db_config = {
     "password": "password",
     "database": "cve_data"
 }
-
-# NVD API endpoint for Microsoft Word CVEs
-nvd_api_url = "https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=microsoft+word"
 
 # Function to sanitize input using bleach
 def sanitize_input(input_string):
@@ -203,6 +202,16 @@ def adminpanel():
 @app.route("/userpanel", methods=["GET", "POST"])
 def userpanel():
     return render_template("user.html")
+
+@app.route("/apiQuery", methods=["POST"])
+def apiQuery():
+    try:
+        search_term = sanitize_input(request.form.get("search_term"))
+        global nvd_api_url
+        nvd_api_url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={search_term}"
+        return jsonify({"message": "API Query change successfully"})
+    except Exception as e:
+        return jsonify({"error": "An error occurred while updating API Query"})
 
 @app.route("/search", methods=["POST"])
 def search():

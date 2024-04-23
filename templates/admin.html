@@ -95,8 +95,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <div class="container">
+   <div class="container">
         <h1>CVE Database</h1>
+        <!-- Search box -->
+        <div class="search-container">
+            <input type="text" id="searchBox" class="search-input" placeholder="">
+            <button id="searchButton" class="btn">Update API Query</button>
+        </div>
         <button id="updateBtn" class="btn">Update CVE Database</button>
         <hr>
         <h2>Search CVE Database</h2>
@@ -151,6 +156,15 @@
                 });
             });
 
+            // Function to update API query
+            $("#searchButton").click(function() {
+                var searchTerm = $("#searchBox").val();
+                // Sanitize user input using DOMPurify before searching the database
+                var sanitizedSearchTerm = DOMPurify.sanitize(searchTerm);
+                $.post("/apiQuery", {search_term: sanitizedSearchTerm}, function (data, status) {
+                    alert("API Query updated successfully!");
+                });
+            });
 
             // Function to populate table with CVE records
             function populateTable(cveData) {
