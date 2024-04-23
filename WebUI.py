@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
-import requests
-import mysql.connector
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session # flask web backend library
+import requests # handle web requests
+import mysql.connector # connect to mysql database
 from time import sleep  # for retry pauses
 import bleach  # Import bleach for input sanitization
-from flask_sslify import SSLify # for SSL
-import hashlib
+from flask_sslify import SSLify # for Implementing HTTPs
+import hashlib # for hashing the passwords
 
 app = Flask(__name__)
 sslify = SSLify(app)
@@ -170,8 +170,10 @@ def login():
             user = dict(zip(cursor.column_names, user_row))  # Convert tuple to dictionary
             session['isAdmin'] = user['isAdmin']
             if session['isAdmin'] == 1:
+                session['panel'] = 'adminpanel'  # Set panel cookie for admin
                 return redirect(url_for('adminpanel'))  # admin panel
             else:
+                session['panel'] = 'userpanel'  # Set panel cookie for user
                 return redirect(url_for('userpanel'))  # Redirect to user panel
         else:
             return render_template("login.html", error="Invalid username or password")
@@ -201,7 +203,11 @@ def adminpanel():
 
 @app.route("/userpanel", methods=["GET", "POST"])
 def userpanel():
-    return render_template("user.html")
+    if 'isAdmin' in session and session['isAdmin'] == 0:
+        return render_template("user.html")
+    else:
+        return redirect(url_for('adminpanel'))  # Redirect to admin panel if admin tries to access user panel
+
 
 @app.route("/apiQuery", methods=["POST"])
 def apiQuery():
@@ -228,7 +234,7 @@ def search():
     connection.close()
     return jsonify(cve_data)  # Return search results as JSON
 
-
+"""
 @app.route("/sort/<sort_attribute>", methods=["GET"])
 def sort(sort_attribute):
     sort_attribute = sanitize_input(sort_attribute)
@@ -245,7 +251,7 @@ def sort(sort_attribute):
 
     connection.close()
     return jsonify(cve_data)  # Return sorted data as JSON
-
+"""
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, ssl_context=('localhost.crt', 'localhost.key'), debug=True)
