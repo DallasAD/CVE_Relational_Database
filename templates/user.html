@@ -81,8 +81,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>CVE Database Update</h1>
-        <button id="updateBtn" class="btn">Update CVE Database</button>
+        <h1>CVE Database</h1>
+        <!-- Removed button for updating CVE database -->
         <hr>
         <h2>Search CVE Database</h2>
         <div class="search-container">
@@ -108,13 +108,6 @@
 
     <script>
         $(document).ready(function() {
-            // Function to update CVE database
-            $("#updateBtn").click(function() {
-                $.post("/", function(data, status) {
-                    alert("CVE Database updated successfully!");
-                });
-            });
-
             // Function to search CVE database
             $("#searchBtn").click(function () {
                 var searchTerm = $("#searchInput").val();
@@ -124,7 +117,6 @@
                     populateTable(data);
                 });
             });
-
 
             // Function to populate table with CVE records
             function populateTable(cveData) {

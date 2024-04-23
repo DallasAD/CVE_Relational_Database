@@ -66,7 +66,7 @@ def create_tables(cursor):
     cursor.execute(insert_default_user_query, ("user", defaultUser_password_hash, 0))
 
 
-def store_cve_data(cursor, cve_data):
+def store_cve_data(connection, cursor, cve_data):
     try:
         # Build SQL insert query with placeholders for values
         query = """
@@ -139,7 +139,7 @@ def store_cve_data(cursor, cve_data):
                 last_modified,
                 first_criteria,
             ))
-            cursor.connection.commit()
+            connection.commit()
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
@@ -161,32 +161,44 @@ def login():
 
         query = "SELECT * FROM Web_Users WHERE username = %s AND password = %s"
         cursor.execute(query, (username, password))
-        user = cursor.fetchone()
+        user_row = cursor.fetchone()
 
         cursor.close()
         connection.close()
 
-        if user:
-            return redirect(url_for('index'))  # Redirect to index page if authentication is successful
+        if user_row:
+            user = dict(zip(cursor.column_names, user_row))  # Convert tuple to dictionary
+            isAdmin = user['isAdmin']
+            if isAdmin == 1:
+                return redirect(url_for('adminpanel'))  # admin panel
+            elif isAdmin == 0:
+                return redirect(url_for('userpanel'))  # Redirect to user panel
         else:
             return render_template("login.html", error="Invalid username or password")
 
     return render_template("login.html")
 
-@app.route("/index", methods=["GET", "POST"])
-def index():
+@app.route("/adminpanel", methods=["GET", "POST"])
+def adminpanel():
     if request.method == "POST":
         try:
             cve_data = fetch_cve_data()
             if cve_data:
-                store_cve_data(cve_data)
+                connection = mysql.connector.connect(**db_config)
+                cursor = connection.cursor()
+                store_cve_data(connection, cursor, cve_data)
+
                 return jsonify({"message": "CVE Database updated successfully"})
             else:
                 return jsonify({"error": "Failed to fetch CVE data"})
         except Exception as e:
             return jsonify({"error": "An error occurred while updating CVE database"})
 
-    return render_template("index.html")
+    return render_template("admin.html")
+
+@app.route("/userpanel", methods=["GET", "POST"])
+def userpanel():
+    return render_template("user.html")
 
 @app.route("/search", methods=["POST"])
 def search():

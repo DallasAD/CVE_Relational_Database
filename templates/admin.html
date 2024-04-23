@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVE Database</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #333; /* Set consistent dark gray background color */
+        color: #fff; /* Set text color to white */
+    }
+
+    .container {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+        color: #fff; /* Set heading color to white */
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #622569;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #141010;
+    }
+
+    .search-container {
+        margin-bottom: 20px;
+        background-color: #333; /* Set search container background color to white */
+        padding: 10px; /* Add padding for better appearance */
+        border-radius: 4px; /* Add border radius for rounded corners */
+    }
+
+    .search-input {
+        padding: 8px;
+        width: 200px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    #cveTable {
+        width: 100%; /* Set table width to 100% */
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    #cveTable th, #cveTable td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    #cveTable th {
+        background-color: #622569; /* Set table header background color */
+    }
+
+    #cveTable tbody tr:nth-child(even) {
+        background-color: #622569; /* Set even row background color */
+    }
+
+    #cveTable tbody tr:nth-child(odd) {
+        color: #fff; /* Set text color to black for odd rows */
+    }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>CVE Database</h1>
+        <button id="updateBtn" class="btn">Update CVE Database</button>
+        <hr>
+        <h2>Search CVE Database</h2>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search...">
+            <button id="searchBtn" class="btn">Search</button>
+        </div>
+        <table id="cveTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>CVSSv2</th>
+                    <th>CVSSv3</th>
+                    <th>Description</th>
+                    <th>Last Modified</th>
+                    <th>First Criteria</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Function to update CVE database
+            $("#updateBtn").click(function() {
+                $.post("/adminpanel", function(data, status) {
+                    alert("CVE Database updated successfully!");
+                });
+            });
+
+            // Function to search CVE database
+            $("#searchBtn").click(function () {
+                var searchTerm = $("#searchInput").val();
+                // Sanitize user input using DOMPurify before searching the database
+                var sanitizedSearchTerm = DOMPurify.sanitize(searchTerm);
+                $.post("/search", {search_term: sanitizedSearchTerm}, function (data, status) {
+                    populateTable(data);
+                });
+            });
+
+
+            // Function to populate table with CVE records
+            function populateTable(cveData) {
+                var tableBody = $("#cveTable tbody");
+                tableBody.empty(); // Clear existing rows
+
+                cveData.forEach(function(record) {
+                    var row = $("<tr>");
+                    row.append($("<td>").text(record[0]));
+                    row.append($("<td>").text(record[1]));
+                    row.append($("<td>").text(record[2]));
+                    row.append($("<td>").text(record[3]));
+                    row.append($("<td>").text(record[4]));
+                    row.append($("<td>").text(record[5]));
+                    tableBody.append(row);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
