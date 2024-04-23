@@ -207,12 +207,13 @@ def userpanel():
 @app.route("/search", methods=["POST"])
 def search():
     search_term = sanitize_input(request.form.get("search_term"))
+    column = sanitize_input(request.form.get("column"))  # New: Get the column to search in
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
 
-    # Build dynamic query based on search term
-    query = f"SELECT * FROM cve_table WHERE id LIKE %s OR cvssV2 LIKE %s OR cvssV3 LIKE %s OR description LIKE %s OR last_modified LIKE %s OR first_criteria LIKE %s"
-    cursor.execute(query, ("%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%", "%" + search_term + "%"))
+    # Build dynamic query based on search term and selected column
+    query = f"SELECT * FROM cve_table WHERE {column} LIKE %s"  # New: Dynamically construct query
+    cursor.execute(query, ("%" + search_term + "%",))
     cve_data = cursor.fetchall()
 
     connection.close()

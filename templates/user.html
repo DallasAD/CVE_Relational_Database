@@ -43,6 +43,21 @@
         background-color: #333; /* Set search container background color to white */
         padding: 10px; /* Add padding for better appearance */
         border-radius: 4px; /* Add border radius for rounded corners */
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown {
+        margin-right: 10px;
+    }
+
+    .column-select {
+        padding: 8px;
+        width: 150px; /* Set dropdown width */
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+        height: calc(100% - 22px); /* Set dropdown height */
     }
 
     .search-input {
@@ -82,10 +97,19 @@
 <body>
     <div class="container">
         <h1>CVE Database</h1>
-        <!-- Removed button for updating CVE database -->
         <hr>
         <h2>Search CVE Database</h2>
         <div class="search-container">
+            <div class="dropdown">
+                <select id="columnSelect" class="column-select">
+                    <option value="ID">ID</option>
+                    <option value="CVSSv2">CVSSv2</option>
+                    <option value="CVSSv3">CVSSv3</option>
+                    <option value="Description">Description</option>
+                    <option value="LastModified">Last Modified</option>
+                    <option value="FirstCriteria">First Criteria</option>
+                </select>
+            </div>
             <input type="text" id="searchInput" class="search-input" placeholder="Search...">
             <button id="searchBtn" class="btn">Search</button>
         </div>
@@ -111,12 +135,14 @@
             // Function to search CVE database
             $("#searchBtn").click(function () {
                 var searchTerm = $("#searchInput").val();
+                var selectedColumn = $("#columnSelect").val();
                 // Sanitize user input using DOMPurify before searching the database
                 var sanitizedSearchTerm = DOMPurify.sanitize(searchTerm);
-                $.post("/search", {search_term: sanitizedSearchTerm}, function (data, status) {
+                $.post("/search", {column: selectedColumn, search_term: sanitizedSearchTerm}, function (data, status) {
                     populateTable(data);
                 });
             });
+
 
             // Function to populate table with CVE records
             function populateTable(cveData) {
