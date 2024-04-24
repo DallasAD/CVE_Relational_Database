@@ -22,7 +22,3 @@ Type `https://127.0.0.1:5000` into the address bar of your web browser.
 ```bash
 docker-compose down
 ```
-## How to generate a new self-signed certificate and private key
-```bash
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt -subj "/CN=localhost"
-```
