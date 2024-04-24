@@ -234,6 +234,26 @@ def search():
     connection.close()
     return jsonify(cve_data)  # Return search results as JSON
 
+@app.route("/cve/<cve_id>", methods=["GET"])
+def display_cve_info(cve_id):
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor()
+
+    # Fetch detailed information about the CVE using its ID
+    query = "SELECT * FROM cve_table WHERE id = %s"
+    cursor.execute(query, (cve_id,))
+    cve_info = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    if cve_info:
+        # Here you can render a template with the detailed CVE information
+        return render_template("cve_info.html", cve_info=cve_info)
+    else:
+        # Handle the case where the CVE ID is not found
+        return jsonify({"error": "CVE not found"}), 404
+
 """
 @app.route("/sort/<sort_attribute>", methods=["GET"])
 def sort(sort_attribute):
