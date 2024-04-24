@@ -2,8 +2,7 @@ FROM python:3.9
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install Flask requests mysql-connector-python bleach flask_sslify
 
 COPY . .
 

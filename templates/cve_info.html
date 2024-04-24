@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVE Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .cve-info {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #622569;
+        }
+        .info-item {
+            margin-bottom: 10px;
+            color: #141010;
+        }
+        .info-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="cve-info">
+        <h2>CVE Information</h2>
+        <div class="info-item">
+            <span class="info-label">CVE ID:</span> <span>{{ cve_info[0] }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">CVSSv2:</span> <span>{{ cve_info[1] }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">CVSSv3:</span> <span>{{ cve_info[2] }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Description:</span> <span>{{ cve_info[3] }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Last Modified:</span> <span>{{ cve_info[4] }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">First Criteria:</span> <span>{{ cve_info[5] }}</span>
+        </div>
+    </div>
+</body>
+</html>

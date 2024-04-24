@@ -17,17 +17,8 @@ docker-compose up -d
 docker-compose ps
 ```
 ## Step 5: View the Web Page
-Type `http://127.0.0.1:5000` into the address bar of your web browser.
+Type `https://127.0.0.1:5000` into the address bar of your web browser.
 ## Step 6: Stop the Docker containers
 ```bash
 docker-compose down
-```
-## Extra Commands:
-shows all the built docker images.
-```bash
-docker images
-```
-removes a saved docker image
-```bash
-docker rmi "image_id"
 ```
